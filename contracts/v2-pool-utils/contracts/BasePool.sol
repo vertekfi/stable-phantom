@@ -141,35 +141,45 @@ abstract contract BasePool is
         return _miscData.decodeUint64(_SWAP_FEE_PERCENTAGE_OFFSET);
     }
 
-    function setSwapFeePercentage(uint256 swapFeePercentage)
-        public
-        virtual
-        authenticate
-        whenNotPaused
-    {
+    function setSwapFeePercentage(
+        uint256 swapFeePercentage
+    ) public virtual authenticate whenNotPaused {
         _setSwapFeePercentage(swapFeePercentage);
     }
 
     function _setSwapFeePercentage(uint256 swapFeePercentage) private {
-        _require(swapFeePercentage >= _MIN_SWAP_FEE_PERCENTAGE, Errors.MIN_SWAP_FEE_PERCENTAGE);
-        _require(swapFeePercentage <= _MAX_SWAP_FEE_PERCENTAGE, Errors.MAX_SWAP_FEE_PERCENTAGE);
+        _require(
+            swapFeePercentage >= _MIN_SWAP_FEE_PERCENTAGE,
+            Errors.MIN_SWAP_FEE_PERCENTAGE
+        );
+        _require(
+            swapFeePercentage <= _MAX_SWAP_FEE_PERCENTAGE,
+            Errors.MAX_SWAP_FEE_PERCENTAGE
+        );
 
-        _miscData = _miscData.insertUint64(swapFeePercentage, _SWAP_FEE_PERCENTAGE_OFFSET);
+        _miscData = _miscData.insertUint64(
+            swapFeePercentage,
+            _SWAP_FEE_PERCENTAGE_OFFSET
+        );
         emit SwapFeePercentageChanged(swapFeePercentage);
     }
 
-    function setAssetManagerPoolConfig(IERC20 token, bytes memory poolConfig)
-        public
-        virtual
-        authenticate
-        whenNotPaused
-    {
+    function setAssetManagerPoolConfig(
+        IERC20 token,
+        bytes memory poolConfig
+    ) public virtual authenticate whenNotPaused {
         _setAssetManagerPoolConfig(token, poolConfig);
     }
 
-    function _setAssetManagerPoolConfig(IERC20 token, bytes memory poolConfig) private {
+    function _setAssetManagerPoolConfig(
+        IERC20 token,
+        bytes memory poolConfig
+    ) private {
         bytes32 poolId = getPoolId();
-        (, , , address assetManager) = getVault().getPoolTokenInfo(poolId, token);
+        (, , , address assetManager) = getVault().getPoolTokenInfo(
+            poolId,
+            token
+        );
 
         IAssetManager(assetManager).setConfig(poolId, poolConfig);
     }
@@ -178,7 +188,9 @@ abstract contract BasePool is
         _setPaused(paused);
     }
 
-    function _isOwnerOnlyAction(bytes32 actionId) internal view virtual override returns (bool) {
+    function _isOwnerOnlyAction(
+        bytes32 actionId
+    ) internal view virtual override returns (bool) {
         return
             (actionId == getActionId(this.setSwapFeePercentage.selector)) ||
             (actionId == getActionId(this.setAssetManagerPoolConfig.selector));
@@ -212,17 +224,26 @@ abstract contract BasePool is
         uint256 lastChangeBlock,
         uint256 protocolSwapFeePercentage,
         bytes memory userData
-    ) public virtual override onlyVault(poolId) returns (uint256[] memory, uint256[] memory) {
+    )
+        public
+        virtual
+        override
+        onlyVault(poolId)
+        returns (uint256[] memory, uint256[] memory)
+    {
         uint256[] memory scalingFactors = _scalingFactors();
 
         if (totalSupply() == 0) {
-            (uint256 bptAmountOut, uint256[] memory amountsIn) = _onInitializePool(
-                poolId,
-                sender,
-                recipient,
-                scalingFactors,
-                userData
-            );
+            (
+                uint256 bptAmountOut,
+                uint256[] memory amountsIn
+            ) = _onInitializePool(
+                    poolId,
+                    sender,
+                    recipient,
+                    scalingFactors,
+                    userData
+                );
 
             // On initialization, we lock _getMinimumBpt() by minting it for the zero address. This BPT acts as a
             // minimum as it will never be burned, which reduces potential issues with rounding, and also prevents the
@@ -273,7 +294,13 @@ abstract contract BasePool is
         uint256 lastChangeBlock,
         uint256 protocolSwapFeePercentage,
         bytes memory userData
-    ) public virtual override onlyVault(poolId) returns (uint256[] memory, uint256[] memory) {
+    )
+        public
+        virtual
+        override
+        onlyVault(poolId)
+        returns (uint256[] memory, uint256[] memory)
+    {
         uint256[] memory scalingFactors = _scalingFactors();
         _upscaleArray(balances, scalingFactors);
 
@@ -403,7 +430,10 @@ abstract contract BasePool is
         address recipient,
         uint256[] memory scalingFactors,
         bytes memory userData
-    ) internal virtual returns (uint256 bptAmountOut, uint256[] memory amountsIn);
+    )
+        internal
+        virtual
+        returns (uint256 bptAmountOut, uint256[] memory amountsIn);
 
     /**
      * @dev Called whenever the Pool is joined after the first initialization join (see `_onInitializePool`).
@@ -488,7 +518,9 @@ abstract contract BasePool is
     /**
      * @dev Subtracts swap fee amount from `amount`, returning a lower value.
      */
-    function _subtractSwapFeeAmount(uint256 amount) internal view returns (uint256) {
+    function _subtractSwapFeeAmount(
+        uint256 amount
+    ) internal view returns (uint256) {
         // This returns amount - fee amount, so we round up (favoring a higher fee amount).
         uint256 feeAmount = amount.mulUp(getSwapFeePercentage());
         return amount.sub(feeAmount);
@@ -500,7 +532,9 @@ abstract contract BasePool is
      * @dev Returns a scaling factor that, when multiplied to a token amount for `token`, normalizes its balance as if
      * it had 18 decimals.
      */
-    function _computeScalingFactor(IERC20 token) internal view returns (uint256) {
+    function _computeScalingFactor(
+        IERC20 token
+    ) internal view returns (uint256) {
         if (address(token) == address(this)) {
             return FixedPoint.ONE;
         }
@@ -510,7 +544,7 @@ abstract contract BasePool is
 
         // Tokens with more than 18 decimals are not supported.
         uint256 decimalsDifference = Math.sub(18, tokenDecimals);
-        return FixedPoint.ONE * 10**decimalsDifference;
+        return FixedPoint.ONE * 10 ** decimalsDifference;
     }
 
     /**
@@ -526,7 +560,9 @@ abstract contract BasePool is
      *
      * The 1e7 figure is the result of 2**256 / (1e18 * 1e18 * 2**112).
      */
-    function _scalingFactor(IERC20 token) internal view virtual returns (uint256);
+    function _scalingFactor(
+        IERC20 token
+    ) internal view virtual returns (uint256);
 
     /**
      * @dev Same as `_scalingFactor()`, except for all registered tokens (in the same order as registered). The Vault
@@ -542,7 +578,10 @@ abstract contract BasePool is
      * @dev Applies `scalingFactor` to `amount`, resulting in a larger or equal value depending on whether it needed
      * scaling or not.
      */
-    function _upscale(uint256 amount, uint256 scalingFactor) internal pure returns (uint256) {
+    function _upscale(
+        uint256 amount,
+        uint256 scalingFactor
+    ) internal pure returns (uint256) {
         // Upscale rounding wouldn't necessarily always go in the same direction: in a swap for example the balance of
         // token in should be rounded up, and that of token out rounded down. This is the only place where we round in
         // the same direction for all amounts, as the impact of this rounding is expected to be minimal (and there's no
@@ -554,10 +593,10 @@ abstract contract BasePool is
      * @dev Same as `_upscale`, but for an entire array. This function does not return anything, but instead *mutates*
      * the `amounts` array.
      */
-    function _upscaleArray(uint256[] memory amounts, uint256[] memory scalingFactors)
-        internal
-        view
-    {
+    function _upscaleArray(
+        uint256[] memory amounts,
+        uint256[] memory scalingFactors
+    ) internal view {
         for (uint256 i = 0; i < _getTotalTokens(); ++i) {
             amounts[i] = FixedPoint.mulDown(amounts[i], scalingFactors[i]);
         }
@@ -567,7 +606,10 @@ abstract contract BasePool is
      * @dev Reverses the `scalingFactor` applied to `amount`, resulting in a smaller or equal value depending on
      * whether it needed scaling or not. The result is rounded down.
      */
-    function _downscaleDown(uint256 amount, uint256 scalingFactor) internal pure returns (uint256) {
+    function _downscaleDown(
+        uint256 amount,
+        uint256 scalingFactor
+    ) internal pure returns (uint256) {
         return FixedPoint.divDown(amount, scalingFactor);
     }
 
@@ -575,10 +617,10 @@ abstract contract BasePool is
      * @dev Same as `_downscaleDown`, but for an entire array. This function does not return anything, but instead
      * *mutates* the `amounts` array.
      */
-    function _downscaleDownArray(uint256[] memory amounts, uint256[] memory scalingFactors)
-        internal
-        view
-    {
+    function _downscaleDownArray(
+        uint256[] memory amounts,
+        uint256[] memory scalingFactors
+    ) internal view {
         for (uint256 i = 0; i < _getTotalTokens(); ++i) {
             amounts[i] = FixedPoint.divDown(amounts[i], scalingFactors[i]);
         }
@@ -588,7 +630,10 @@ abstract contract BasePool is
      * @dev Reverses the `scalingFactor` applied to `amount`, resulting in a smaller or equal value depending on
      * whether it needed scaling or not. The result is rounded up.
      */
-    function _downscaleUp(uint256 amount, uint256 scalingFactor) internal pure returns (uint256) {
+    function _downscaleUp(
+        uint256 amount,
+        uint256 scalingFactor
+    ) internal pure returns (uint256) {
         return FixedPoint.divUp(amount, scalingFactor);
     }
 
@@ -596,10 +641,10 @@ abstract contract BasePool is
      * @dev Same as `_downscaleUp`, but for an entire array. This function does not return anything, but instead
      * *mutates* the `amounts` array.
      */
-    function _downscaleUpArray(uint256[] memory amounts, uint256[] memory scalingFactors)
-        internal
-        view
-    {
+    function _downscaleUpArray(
+        uint256[] memory amounts,
+        uint256[] memory scalingFactors
+    ) internal view {
         for (uint256 i = 0; i < _getTotalTokens(); ++i) {
             amounts[i] = FixedPoint.divUp(amounts[i], scalingFactors[i]);
         }
@@ -630,8 +675,12 @@ abstract contract BasePool is
             uint256,
             uint256[] memory,
             bytes memory
-        ) internal returns (uint256, uint256[] memory, uint256[] memory) _action,
-        function(uint256[] memory, uint256[] memory) internal view _downscaleArray
+        )
+            internal
+            returns (uint256, uint256[] memory, uint256[] memory) _action,
+        function(uint256[] memory, uint256[] memory)
+            internal
+            view _downscaleArray
     ) private {
         // This uses the same technique used by the Vault in queryBatchSwap. Refer to that function for a detailed
         // explanation.

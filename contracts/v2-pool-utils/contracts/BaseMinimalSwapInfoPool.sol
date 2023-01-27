@@ -38,11 +38,16 @@ abstract contract BaseMinimalSwapInfoPool is IMinimalSwapInfoPool, BasePool {
 
         if (request.kind == IVault.SwapKind.GIVEN_IN) {
             // Fees are subtracted before scaling, to reduce the complexity of the rounding direction analysis.
-            uint256 amountInMinusSwapFees = _subtractSwapFeeAmount(request.amount);
+            uint256 amountInMinusSwapFees = _subtractSwapFeeAmount(
+                request.amount
+            );
 
             // Process the (upscaled!) swap fee.
             uint256 swapFee = request.amount - amountInMinusSwapFees;
-            _processSwapFeeAmount(request.tokenIn, _upscale(swapFee, scalingFactorTokenIn));
+            _processSwapFeeAmount(
+                request.tokenIn,
+                _upscale(swapFee, scalingFactorTokenIn)
+            );
 
             request.amount = amountInMinusSwapFees;
 
@@ -51,7 +56,11 @@ abstract contract BaseMinimalSwapInfoPool is IMinimalSwapInfoPool, BasePool {
             balanceTokenOut = _upscale(balanceTokenOut, scalingFactorTokenOut);
             request.amount = _upscale(request.amount, scalingFactorTokenIn);
 
-            uint256 amountOut = _onSwapGivenIn(request, balanceTokenIn, balanceTokenOut);
+            uint256 amountOut = _onSwapGivenIn(
+                request,
+                balanceTokenIn,
+                balanceTokenOut
+            );
 
             // amountOut tokens are exiting the Pool, so we round down.
             return _downscaleDown(amountOut, scalingFactorTokenOut);
@@ -61,7 +70,11 @@ abstract contract BaseMinimalSwapInfoPool is IMinimalSwapInfoPool, BasePool {
             balanceTokenOut = _upscale(balanceTokenOut, scalingFactorTokenOut);
             request.amount = _upscale(request.amount, scalingFactorTokenOut);
 
-            uint256 amountIn = _onSwapGivenOut(request, balanceTokenIn, balanceTokenOut);
+            uint256 amountIn = _onSwapGivenOut(
+                request,
+                balanceTokenIn,
+                balanceTokenOut
+            );
 
             // amountIn tokens are entering the Pool, so we round up.
             amountIn = _downscaleUp(amountIn, scalingFactorTokenIn);
@@ -71,7 +84,10 @@ abstract contract BaseMinimalSwapInfoPool is IMinimalSwapInfoPool, BasePool {
 
             // Process the (upscaled!) swap fee.
             uint256 swapFee = amountInPlusSwapFees - amountIn;
-            _processSwapFeeAmount(request.tokenIn, _upscale(swapFee, scalingFactorTokenIn));
+            _processSwapFeeAmount(
+                request.tokenIn,
+                _upscale(swapFee, scalingFactorTokenIn)
+            );
 
             return amountInPlusSwapFees;
         }
@@ -118,7 +134,7 @@ abstract contract BaseMinimalSwapInfoPool is IMinimalSwapInfoPool, BasePool {
      * and upscale `amount`.
      */
     function _processSwapFeeAmount(
-        uint256, /*index*/
+        uint256 /*index*/,
         uint256 /*amount*/
     ) internal virtual {
         // solhint-disable-previous-line no-empty-blocks

@@ -54,11 +54,9 @@ library PriceRateCache {
     /**
      * @dev Returns the duration and expiration time of a price rate cache.
      */
-    function getTimestamps(bytes32 cache)
-        internal
-        pure
-        returns (uint256 duration, uint256 expires)
-    {
+    function getTimestamps(
+        bytes32 cache
+    ) internal pure returns (uint256 duration, uint256 expires) {
         duration = getDuration(cache);
         expires = cache.decodeUint64(_PRICE_RATE_CACHE_EXPIRES_OFFSET);
     }
@@ -67,13 +65,22 @@ library PriceRateCache {
      * @dev Encodes rate and duration into a price rate cache. The expiration time is computed automatically, counting
      * from the current time.
      */
-    function encode(uint256 rate, uint256 duration) internal view returns (bytes32) {
-        _require(rate < 2**128, Errors.PRICE_RATE_OVERFLOW);
+    function encode(
+        uint256 rate,
+        uint256 duration
+    ) internal view returns (bytes32) {
+        _require(rate < 2 ** 128, Errors.PRICE_RATE_OVERFLOW);
 
         // solhint-disable not-rely-on-time
         return
-            WordCodec.encodeUint(uint128(rate), _PRICE_RATE_CACHE_VALUE_OFFSET) |
-            WordCodec.encodeUint(uint64(duration), _PRICE_RATE_CACHE_DURATION_OFFSET) |
+            WordCodec.encodeUint(
+                uint128(rate),
+                _PRICE_RATE_CACHE_VALUE_OFFSET
+            ) |
+            WordCodec.encodeUint(
+                uint64(duration),
+                _PRICE_RATE_CACHE_DURATION_OFFSET
+            ) |
             WordCodec.encodeUint(
                 uint64(block.timestamp + duration),
                 _PRICE_RATE_CACHE_EXPIRES_OFFSET
@@ -83,15 +90,9 @@ library PriceRateCache {
     /**
      * @dev Returns rate, duration and expiration time of a price rate cache.
      */
-    function decode(bytes32 cache)
-        internal
-        pure
-        returns (
-            uint256 rate,
-            uint256 duration,
-            uint256 expires
-        )
-    {
+    function decode(
+        bytes32 cache
+    ) internal pure returns (uint256 rate, uint256 duration, uint256 expires) {
         rate = getRate(cache);
         (duration, expires) = getTimestamps(cache);
     }

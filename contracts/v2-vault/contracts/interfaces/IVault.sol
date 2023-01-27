@@ -86,7 +86,10 @@ interface IVault is ISignaturesValidator, ITemporarilyPausable {
     /**
      * @dev Returns true if `user` has approved `relayer` to act as a relayer for them.
      */
-    function hasApprovedRelayer(address user, address relayer) external view returns (bool);
+    function hasApprovedRelayer(
+        address user,
+        address relayer
+    ) external view returns (bool);
 
     /**
      * @dev Allows `relayer` to act as a relayer for `sender` if `approved` is true, and disallows it otherwise.
@@ -102,7 +105,11 @@ interface IVault is ISignaturesValidator, ITemporarilyPausable {
     /**
      * @dev Emitted every time a relayer is approved or disapproved by `setRelayerApproval`.
      */
-    event RelayerApprovalChanged(address indexed relayer, address indexed sender, bool approved);
+    event RelayerApprovalChanged(
+        address indexed relayer,
+        address indexed sender,
+        bool approved
+    );
 
     // Internal Balance
     //
@@ -117,10 +124,10 @@ interface IVault is ISignaturesValidator, ITemporarilyPausable {
     /**
      * @dev Returns `user`'s Internal Balance for a set of tokens.
      */
-    function getInternalBalance(address user, IERC20[] memory tokens)
-        external
-        view
-        returns (uint256[] memory);
+    function getInternalBalance(
+        address user,
+        IERC20[] memory tokens
+    ) external view returns (uint256[] memory);
 
     /**
      * @dev Performs a set of user balance operations, which involve Internal Balance (deposit, withdraw or transfer)
@@ -195,7 +202,11 @@ interface IVault is ISignaturesValidator, ITemporarilyPausable {
      * Because Internal Balance works exclusively with ERC20 tokens, ETH deposits and withdrawals will use the WETH
      * address.
      */
-    event InternalBalanceChanged(address indexed user, IERC20 indexed token, int256 delta);
+    event InternalBalanceChanged(
+        address indexed user,
+        IERC20 indexed token,
+        int256 delta
+    );
 
     /**
      * @dev Emitted when a user's Vault ERC20 allowance is used by the Vault to transfer tokens to an external account.
@@ -243,7 +254,9 @@ interface IVault is ISignaturesValidator, ITemporarilyPausable {
      *
      * Emits a `PoolRegistered` event.
      */
-    function registerPool(PoolSpecialization specialization) external returns (bytes32);
+    function registerPool(
+        PoolSpecialization specialization
+    ) external returns (bytes32);
 
     /**
      * @dev Emitted when a Pool is registered by calling `registerPool`.
@@ -257,7 +270,9 @@ interface IVault is ISignaturesValidator, ITemporarilyPausable {
     /**
      * @dev Returns a Pool's contract address and specialization setting.
      */
-    function getPool(bytes32 poolId) external view returns (address, PoolSpecialization);
+    function getPool(
+        bytes32 poolId
+    ) external view returns (address, PoolSpecialization);
 
     /**
      * @dev Registers `tokens` for the `poolId` Pool. Must be called by the Pool's contract.
@@ -290,7 +305,11 @@ interface IVault is ISignaturesValidator, ITemporarilyPausable {
     /**
      * @dev Emitted when a Pool registers tokens by calling `registerTokens`.
      */
-    event TokensRegistered(bytes32 indexed poolId, IERC20[] tokens, address[] assetManagers);
+    event TokensRegistered(
+        bytes32 indexed poolId,
+        IERC20[] tokens,
+        address[] assetManagers
+    );
 
     /**
      * @dev Deregisters `tokens` for the `poolId` Pool. Must be called by the Pool's contract.
@@ -327,7 +346,10 @@ interface IVault is ISignaturesValidator, ITemporarilyPausable {
      *
      * `assetManager` is the Pool's token Asset Manager.
      */
-    function getPoolTokenInfo(bytes32 poolId, IERC20 token)
+    function getPoolTokenInfo(
+        bytes32 poolId,
+        IERC20 token
+    )
         external
         view
         returns (
@@ -351,7 +373,9 @@ interface IVault is ISignaturesValidator, ITemporarilyPausable {
      * the amounts used by joins, exits and swaps. For a detailed breakdown of token balances, use `getPoolTokenInfo`
      * instead.
      */
-    function getPoolTokens(bytes32 poolId)
+    function getPoolTokens(
+        bytes32 poolId
+    )
         external
         view
         returns (
@@ -780,7 +804,10 @@ interface IVault is ISignaturesValidator, ITemporarilyPausable {
     /**
      * @dev Returns the current protocol fee module.
      */
-    function getProtocolFeesCollector() external view returns (IProtocolFeesCollector);
+    function getProtocolFeesCollector()
+        external
+        view
+        returns (IProtocolFeesCollector);
 
     /**
      * @dev Safety mechanism to pause most Vault operations in the event of an emergency - typically detection of an

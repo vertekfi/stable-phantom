@@ -47,16 +47,17 @@ interface IAssetManager {
      * @return poolCash - The up-to-date cash balance of the pool
      * @return poolManaged - The up-to-date managed balance of the pool
      */
-    function getPoolBalances(bytes32 poolId)
-        external
-        view
-        returns (uint256 poolCash, uint256 poolManaged);
+    function getPoolBalances(
+        bytes32 poolId
+    ) external view returns (uint256 poolCash, uint256 poolManaged);
 
     /**
      * @return The difference in tokens between the target investment
      * and the currently invested amount (i.e. the amount that can be invested)
      */
-    function maxInvestableBalance(bytes32 poolId) external view returns (int256);
+    function maxInvestableBalance(
+        bytes32 poolId
+    ) external view returns (int256);
 
     /**
      * @notice Updates the Vault on the value of the pool's investment returns
@@ -66,7 +67,10 @@ interface IAssetManager {
     /**
      * @notice Determines whether the pool should rebalance given the provided balances
      */
-    function shouldRebalance(uint256 cash, uint256 managed) external view returns (bool);
+    function shouldRebalance(
+        uint256 cash,
+        uint256 managed
+    ) external view returns (bool);
 
     /**
      * @notice Rebalances funds between the pool and the asset manager to maintain target investment percentage.

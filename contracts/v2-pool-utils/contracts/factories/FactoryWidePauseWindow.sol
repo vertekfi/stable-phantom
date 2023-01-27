@@ -33,7 +33,9 @@ contract FactoryWidePauseWindow {
     uint256 private immutable _poolsPauseWindowEndTime;
 
     constructor() {
-        _poolsPauseWindowEndTime = block.timestamp + _INITIAL_PAUSE_WINDOW_DURATION;
+        _poolsPauseWindowEndTime =
+            block.timestamp +
+            _INITIAL_PAUSE_WINDOW_DURATION;
     }
 
     /**

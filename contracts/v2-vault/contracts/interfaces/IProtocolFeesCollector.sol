@@ -32,16 +32,17 @@ interface IProtocolFeesCollector {
 
     function setSwapFeePercentage(uint256 newSwapFeePercentage) external;
 
-    function setFlashLoanFeePercentage(uint256 newFlashLoanFeePercentage) external;
+    function setFlashLoanFeePercentage(
+        uint256 newFlashLoanFeePercentage
+    ) external;
 
     function getSwapFeePercentage() external view returns (uint256);
 
     function getFlashLoanFeePercentage() external view returns (uint256);
 
-    function getCollectedFeeAmounts(IERC20[] memory tokens)
-        external
-        view
-        returns (uint256[] memory feeAmounts);
+    function getCollectedFeeAmounts(
+        IERC20[] memory tokens
+    ) external view returns (uint256[] memory feeAmounts);
 
     function getAuthorizer() external view returns (IAuthorizer);
 

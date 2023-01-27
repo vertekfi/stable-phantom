@@ -22,10 +22,13 @@ import "./v2-pool-utils/contracts/factories/FactoryWidePauseWindow.sol";
 
 import "./StablePhantomPool.sol";
 
-contract StablePhantomPoolFactory is BasePoolSplitCodeFactory, FactoryWidePauseWindow {
-    constructor(IVault vault)
-        BasePoolSplitCodeFactory(vault, type(StablePhantomPool).creationCode)
-    {
+contract StablePhantomPoolFactory is
+    BasePoolSplitCodeFactory,
+    FactoryWidePauseWindow
+{
+    constructor(
+        IVault vault
+    ) BasePoolSplitCodeFactory(vault, type(StablePhantomPool).creationCode) {
         // solhint-disable-previous-line no-empty-blocks
     }
 
@@ -42,7 +45,10 @@ contract StablePhantomPoolFactory is BasePoolSplitCodeFactory, FactoryWidePauseW
         uint256 swapFeePercentage,
         address owner
     ) external returns (StablePhantomPool) {
-        (uint256 pauseWindowDuration, uint256 bufferPeriodDuration) = getPauseConfiguration();
+        (
+            uint256 pauseWindowDuration,
+            uint256 bufferPeriodDuration
+        ) = getPauseConfiguration();
         return
             StablePhantomPool(
                 _create(

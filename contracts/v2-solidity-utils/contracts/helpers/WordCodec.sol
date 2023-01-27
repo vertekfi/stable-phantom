@@ -32,23 +32,23 @@ pragma solidity ^0.7.0;
 library WordCodec {
     // Masks are values with the least significant N bits set. They can be used to extract an encoded value from a word,
     // or to insert a new one replacing the old.
-    uint256 private constant _MASK_1 = 2**(1) - 1;
-    uint256 private constant _MASK_5 = 2**(5) - 1;
-    uint256 private constant _MASK_7 = 2**(7) - 1;
-    uint256 private constant _MASK_10 = 2**(10) - 1;
-    uint256 private constant _MASK_16 = 2**(16) - 1;
-    uint256 private constant _MASK_22 = 2**(22) - 1;
-    uint256 private constant _MASK_31 = 2**(31) - 1;
-    uint256 private constant _MASK_32 = 2**(32) - 1;
-    uint256 private constant _MASK_53 = 2**(53) - 1;
-    uint256 private constant _MASK_64 = 2**(64) - 1;
-    uint256 private constant _MASK_96 = 2**(96) - 1;
-    uint256 private constant _MASK_128 = 2**(128) - 1;
-    uint256 private constant _MASK_192 = 2**(192) - 1;
+    uint256 private constant _MASK_1 = 2 ** (1) - 1;
+    uint256 private constant _MASK_5 = 2 ** (5) - 1;
+    uint256 private constant _MASK_7 = 2 ** (7) - 1;
+    uint256 private constant _MASK_10 = 2 ** (10) - 1;
+    uint256 private constant _MASK_16 = 2 ** (16) - 1;
+    uint256 private constant _MASK_22 = 2 ** (22) - 1;
+    uint256 private constant _MASK_31 = 2 ** (31) - 1;
+    uint256 private constant _MASK_32 = 2 ** (32) - 1;
+    uint256 private constant _MASK_53 = 2 ** (53) - 1;
+    uint256 private constant _MASK_64 = 2 ** (64) - 1;
+    uint256 private constant _MASK_96 = 2 ** (96) - 1;
+    uint256 private constant _MASK_128 = 2 ** (128) - 1;
+    uint256 private constant _MASK_192 = 2 ** (192) - 1;
 
     // Largest positive values that can be represented as N bits signed integers.
-    int256 private constant _MAX_INT_22 = 2**(21) - 1;
-    int256 private constant _MAX_INT_53 = 2**(52) - 1;
+    int256 private constant _MAX_INT_22 = 2 ** (21) - 1;
+    int256 private constant _MAX_INT_53 = 2 ** (52) - 1;
 
     // In-place insertion
 
@@ -216,7 +216,10 @@ library WordCodec {
      *
      * The return value can be logically ORed with other encoded values to form a 256 bit word.
      */
-    function encodeUint(uint256 value, uint256 offset) internal pure returns (bytes32) {
+    function encodeUint(
+        uint256 value,
+        uint256 offset
+    ) internal pure returns (bytes32) {
         return bytes32(value << offset);
     }
 
@@ -227,7 +230,10 @@ library WordCodec {
      *
      * The return value can be logically ORed with other encoded values to form a 256 bit word.
      */
-    function encodeInt22(int256 value, uint256 offset) internal pure returns (bytes32) {
+    function encodeInt22(
+        int256 value,
+        uint256 offset
+    ) internal pure returns (bytes32) {
         // Integer values need masking to remove the upper bits of negative values.
         return bytes32((uint256(value) & _MASK_22) << offset);
     }
@@ -237,7 +243,10 @@ library WordCodec {
      *
      * The return value can be logically ORed with other encoded values to form a 256 bit word.
      */
-    function encodeInt53(int256 value, uint256 offset) internal pure returns (bytes32) {
+    function encodeInt53(
+        int256 value,
+        uint256 offset
+    ) internal pure returns (bytes32) {
         // Integer values need masking to remove the upper bits of negative values.
         return bytes32((uint256(value) & _MASK_53) << offset);
     }
@@ -247,7 +256,10 @@ library WordCodec {
     /**
      * @dev Decodes and returns a boolean shifted by an offset from a 256 bit word.
      */
-    function decodeBool(bytes32 word, uint256 offset) internal pure returns (bool) {
+    function decodeBool(
+        bytes32 word,
+        uint256 offset
+    ) internal pure returns (bool) {
         return (uint256(word >> offset) & _MASK_1) == 1;
     }
 
@@ -256,63 +268,90 @@ library WordCodec {
     /**
      * @dev Decodes and returns a 5 bit unsigned integer shifted by an offset from a 256 bit word.
      */
-    function decodeUint5(bytes32 word, uint256 offset) internal pure returns (uint256) {
+    function decodeUint5(
+        bytes32 word,
+        uint256 offset
+    ) internal pure returns (uint256) {
         return uint256(word >> offset) & _MASK_5;
     }
 
     /**
      * @dev Decodes and returns a 7 bit unsigned integer shifted by an offset from a 256 bit word.
      */
-    function decodeUint7(bytes32 word, uint256 offset) internal pure returns (uint256) {
+    function decodeUint7(
+        bytes32 word,
+        uint256 offset
+    ) internal pure returns (uint256) {
         return uint256(word >> offset) & _MASK_7;
     }
 
     /**
      * @dev Decodes and returns a 10 bit unsigned integer shifted by an offset from a 256 bit word.
      */
-    function decodeUint10(bytes32 word, uint256 offset) internal pure returns (uint256) {
+    function decodeUint10(
+        bytes32 word,
+        uint256 offset
+    ) internal pure returns (uint256) {
         return uint256(word >> offset) & _MASK_10;
     }
 
     /**
      * @dev Decodes and returns a 16 bit unsigned integer shifted by an offset from a 256 bit word.
      */
-    function decodeUint16(bytes32 word, uint256 offset) internal pure returns (uint256) {
+    function decodeUint16(
+        bytes32 word,
+        uint256 offset
+    ) internal pure returns (uint256) {
         return uint256(word >> offset) & _MASK_16;
     }
 
     /**
      * @dev Decodes and returns a 31 bit unsigned integer shifted by an offset from a 256 bit word.
      */
-    function decodeUint31(bytes32 word, uint256 offset) internal pure returns (uint256) {
+    function decodeUint31(
+        bytes32 word,
+        uint256 offset
+    ) internal pure returns (uint256) {
         return uint256(word >> offset) & _MASK_31;
     }
 
     /**
      * @dev Decodes and returns a 32 bit unsigned integer shifted by an offset from a 256 bit word.
      */
-    function decodeUint32(bytes32 word, uint256 offset) internal pure returns (uint256) {
+    function decodeUint32(
+        bytes32 word,
+        uint256 offset
+    ) internal pure returns (uint256) {
         return uint256(word >> offset) & _MASK_32;
     }
 
     /**
      * @dev Decodes and returns a 64 bit unsigned integer shifted by an offset from a 256 bit word.
      */
-    function decodeUint64(bytes32 word, uint256 offset) internal pure returns (uint256) {
+    function decodeUint64(
+        bytes32 word,
+        uint256 offset
+    ) internal pure returns (uint256) {
         return uint256(word >> offset) & _MASK_64;
     }
 
     /**
      * @dev Decodes and returns a 96 bit unsigned integer shifted by an offset from a 256 bit word.
      */
-    function decodeUint96(bytes32 word, uint256 offset) internal pure returns (uint256) {
+    function decodeUint96(
+        bytes32 word,
+        uint256 offset
+    ) internal pure returns (uint256) {
         return uint256(word >> offset) & _MASK_96;
     }
 
     /**
      * @dev Decodes and returns a 128 bit unsigned integer shifted by an offset from a 256 bit word.
      */
-    function decodeUint128(bytes32 word, uint256 offset) internal pure returns (uint256) {
+    function decodeUint128(
+        bytes32 word,
+        uint256 offset
+    ) internal pure returns (uint256) {
         return uint256(word >> offset) & _MASK_128;
     }
 
@@ -321,7 +360,10 @@ library WordCodec {
     /**
      * @dev Decodes and returns a 22 bits signed integer shifted by an offset from a 256 bit word.
      */
-    function decodeInt22(bytes32 word, uint256 offset) internal pure returns (int256) {
+    function decodeInt22(
+        bytes32 word,
+        uint256 offset
+    ) internal pure returns (int256) {
         int256 value = int256(uint256(word >> offset) & _MASK_22);
         // In case the decoded value is greater than the max positive integer that can be represented with 22 bits,
         // we know it was originally a negative integer. Therefore, we mask it to restore the sign in the 256 bit
@@ -332,7 +374,10 @@ library WordCodec {
     /**
      * @dev Decodes and returns a 53 bits signed integer shifted by an offset from a 256 bit word.
      */
-    function decodeInt53(bytes32 word, uint256 offset) internal pure returns (int256) {
+    function decodeInt53(
+        bytes32 word,
+        uint256 offset
+    ) internal pure returns (int256) {
         int256 value = int256(uint256(word >> offset) & _MASK_53);
         // In case the decoded value is greater than the max positive integer that can be represented with 53 bits,
         // we know it was originally a negative integer. Therefore, we mask it to restore the sign in the 256 bit

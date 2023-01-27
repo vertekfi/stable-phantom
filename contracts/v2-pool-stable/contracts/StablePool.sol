@@ -124,11 +124,20 @@ contract StablePool is BaseGeneralPool, BaseMinimalSwapInfoPool, IRateProvider {
 
         _scalingFactor0 = _computeScalingFactor(tokens[0]);
         _scalingFactor1 = _computeScalingFactor(tokens[1]);
-        _scalingFactor2 = totalTokens > 2 ? _computeScalingFactor(tokens[2]) : 0;
-        _scalingFactor3 = totalTokens > 3 ? _computeScalingFactor(tokens[3]) : 0;
-        _scalingFactor4 = totalTokens > 4 ? _computeScalingFactor(tokens[4]) : 0;
+        _scalingFactor2 = totalTokens > 2
+            ? _computeScalingFactor(tokens[2])
+            : 0;
+        _scalingFactor3 = totalTokens > 3
+            ? _computeScalingFactor(tokens[3])
+            : 0;
+        _scalingFactor4 = totalTokens > 4
+            ? _computeScalingFactor(tokens[4])
+            : 0;
 
-        uint256 initialAmp = Math.mul(amplificationParameter, StableMath._AMP_PRECISION);
+        uint256 initialAmp = Math.mul(
+            amplificationParameter,
+            StableMath._AMP_PRECISION
+        );
         _setAmplificationData(initialAmp);
     }
 
@@ -153,7 +162,11 @@ contract StablePool is BaseGeneralPool, BaseMinimalSwapInfoPool, IRateProvider {
     ) internal virtual override whenNotPaused returns (uint256) {
         (uint256 currentAmp, ) = _getAmplificationParameter();
 
-        uint256 invariant = StableMath._calculateInvariant(currentAmp, balances, true);
+        uint256 invariant = StableMath._calculateInvariant(
+            currentAmp,
+            balances,
+            true
+        );
         uint256 amountOut = StableMath._calcOutGivenIn(
             currentAmp,
             balances,
@@ -174,7 +187,11 @@ contract StablePool is BaseGeneralPool, BaseMinimalSwapInfoPool, IRateProvider {
     ) internal virtual override whenNotPaused returns (uint256) {
         (uint256 currentAmp, ) = _getAmplificationParameter();
 
-        uint256 invariant = StableMath._calculateInvariant(currentAmp, balances, true);
+        uint256 invariant = StableMath._calculateInvariant(
+            currentAmp,
+            balances,
+            true
+        );
         uint256 amountIn = StableMath._calcInGivenOut(
             currentAmp,
             balances,
@@ -196,11 +213,11 @@ contract StablePool is BaseGeneralPool, BaseMinimalSwapInfoPool, IRateProvider {
     ) internal virtual override returns (uint256) {
         _require(_getTotalTokens() == 2, Errors.NOT_TWO_TOKENS);
 
-        (uint256[] memory balances, uint256 indexIn, uint256 indexOut) = _getSwapBalanceArrays(
-            swapRequest,
-            balanceTokenIn,
-            balanceTokenOut
-        );
+        (
+            uint256[] memory balances,
+            uint256 indexIn,
+            uint256 indexOut
+        ) = _getSwapBalanceArrays(swapRequest, balanceTokenIn, balanceTokenOut);
 
         return _onSwapGivenIn(swapRequest, balances, indexIn, indexOut);
     }
@@ -212,11 +229,11 @@ contract StablePool is BaseGeneralPool, BaseMinimalSwapInfoPool, IRateProvider {
     ) internal virtual override returns (uint256) {
         _require(_getTotalTokens() == 2, Errors.NOT_TWO_TOKENS);
 
-        (uint256[] memory balances, uint256 indexIn, uint256 indexOut) = _getSwapBalanceArrays(
-            swapRequest,
-            balanceTokenIn,
-            balanceTokenOut
-        );
+        (
+            uint256[] memory balances,
+            uint256 indexIn,
+            uint256 indexOut
+        ) = _getSwapBalanceArrays(swapRequest, balanceTokenIn, balanceTokenOut);
         return _onSwapGivenOut(swapRequest, balances, indexIn, indexOut);
     }
 
@@ -227,11 +244,7 @@ contract StablePool is BaseGeneralPool, BaseMinimalSwapInfoPool, IRateProvider {
     )
         private
         view
-        returns (
-            uint256[] memory balances,
-            uint256 indexIn,
-            uint256 indexOut
-        )
+        returns (uint256[] memory balances, uint256 indexIn, uint256 indexOut)
     {
         balances = new uint256[](2);
 
@@ -259,19 +272,35 @@ contract StablePool is BaseGeneralPool, BaseMinimalSwapInfoPool, IRateProvider {
         address,
         uint256[] memory scalingFactors,
         bytes memory userData
-    ) internal virtual override whenNotPaused returns (uint256, uint256[] memory) {
+    )
+        internal
+        virtual
+        override
+        whenNotPaused
+        returns (uint256, uint256[] memory)
+    {
         // It would be strange for the Pool to be paused before it is initialized, but for consistency we prevent
         // initialization in this case.
 
         StablePoolUserData.JoinKind kind = userData.joinKind();
-        _require(kind == StablePoolUserData.JoinKind.INIT, Errors.UNINITIALIZED);
+        _require(
+            kind == StablePoolUserData.JoinKind.INIT,
+            Errors.UNINITIALIZED
+        );
 
         uint256[] memory amountsIn = userData.initialAmountsIn();
-        InputHelpers.ensureInputLengthMatch(amountsIn.length, _getTotalTokens());
+        InputHelpers.ensureInputLengthMatch(
+            amountsIn.length,
+            _getTotalTokens()
+        );
         _upscaleArray(amountsIn, scalingFactors);
 
         (uint256 currentAmp, ) = _getAmplificationParameter();
-        uint256 invariantAfterJoin = StableMath._calculateInvariant(currentAmp, amountsIn, true);
+        uint256 invariantAfterJoin = StableMath._calculateInvariant(
+            currentAmp,
+            amountsIn,
+            true
+        );
 
         // Set the initial BPT to the value of the invariant.
         uint256 bptAmountOut = invariantAfterJoin;
@@ -297,11 +326,7 @@ contract StablePool is BaseGeneralPool, BaseMinimalSwapInfoPool, IRateProvider {
         virtual
         override
         whenNotPaused
-        returns (
-            uint256,
-            uint256[] memory,
-            uint256[] memory
-        )
+        returns (uint256, uint256[] memory, uint256[] memory)
     {
         // Due protocol swap fee amounts are computed by measuring the growth of the invariant between the previous join
         // or exit event and now - the invariant's growth is due exclusively to swap fees. This avoids spending gas to
@@ -334,8 +359,11 @@ contract StablePool is BaseGeneralPool, BaseMinimalSwapInfoPool, IRateProvider {
         StablePoolUserData.JoinKind kind = userData.joinKind();
 
         if (kind == StablePoolUserData.JoinKind.EXACT_TOKENS_IN_FOR_BPT_OUT) {
-            return _joinExactTokensInForBPTOut(balances, scalingFactors, userData);
-        } else if (kind == StablePoolUserData.JoinKind.TOKEN_IN_FOR_EXACT_BPT_OUT) {
+            return
+                _joinExactTokensInForBPTOut(balances, scalingFactors, userData);
+        } else if (
+            kind == StablePoolUserData.JoinKind.TOKEN_IN_FOR_EXACT_BPT_OUT
+        ) {
             return _joinTokenInForExactBPTOut(balances, userData);
         } else {
             _revert(Errors.UNHANDLED_JOIN_KIND);
@@ -347,8 +375,12 @@ contract StablePool is BaseGeneralPool, BaseMinimalSwapInfoPool, IRateProvider {
         uint256[] memory scalingFactors,
         bytes memory userData
     ) private view returns (uint256, uint256[] memory) {
-        (uint256[] memory amountsIn, uint256 minBPTAmountOut) = userData.exactTokensInForBptOut();
-        InputHelpers.ensureInputLengthMatch(_getTotalTokens(), amountsIn.length);
+        (uint256[] memory amountsIn, uint256 minBPTAmountOut) = userData
+            .exactTokensInForBptOut();
+        InputHelpers.ensureInputLengthMatch(
+            _getTotalTokens(),
+            amountsIn.length
+        );
 
         _upscaleArray(amountsIn, scalingFactors);
 
@@ -366,12 +398,12 @@ contract StablePool is BaseGeneralPool, BaseMinimalSwapInfoPool, IRateProvider {
         return (bptAmountOut, amountsIn);
     }
 
-    function _joinTokenInForExactBPTOut(uint256[] memory balances, bytes memory userData)
-        private
-        view
-        returns (uint256, uint256[] memory)
-    {
-        (uint256 bptAmountOut, uint256 tokenIndex) = userData.tokenInForExactBptOut();
+    function _joinTokenInForExactBPTOut(
+        uint256[] memory balances,
+        bytes memory userData
+    ) private view returns (uint256, uint256[] memory) {
+        (uint256 bptAmountOut, uint256 tokenIndex) = userData
+            .tokenInForExactBptOut();
         // Note that there is no maximum amountIn parameter: this is handled by `IVault.joinPool`.
 
         _require(tokenIndex < _getTotalTokens(), Errors.OUT_OF_BOUNDS);
@@ -418,7 +450,10 @@ contract StablePool is BaseGeneralPool, BaseMinimalSwapInfoPool, IRateProvider {
             // Due protocol swap fee amounts are computed by measuring the growth of the invariant between the previous
             // join or exit event and now - the invariant's growth is due exclusively to swap fees. This avoids
             // spending gas calculating fee amounts during each individual swap
-            dueProtocolFeeAmounts = _getDueProtocolFeeAmounts(balances, protocolSwapFeePercentage);
+            dueProtocolFeeAmounts = _getDueProtocolFeeAmounts(
+                balances,
+                protocolSwapFeePercentage
+            );
 
             // Update current balances by subtracting the protocol fee amounts
             _mutateAmounts(balances, dueProtocolFeeAmounts, FixedPoint.sub);
@@ -444,26 +479,32 @@ contract StablePool is BaseGeneralPool, BaseMinimalSwapInfoPool, IRateProvider {
     ) private view returns (uint256, uint256[] memory) {
         StablePoolUserData.ExitKind kind = userData.exitKind();
 
-        if (kind == StablePoolUserData.ExitKind.EXACT_BPT_IN_FOR_ONE_TOKEN_OUT) {
+        if (
+            kind == StablePoolUserData.ExitKind.EXACT_BPT_IN_FOR_ONE_TOKEN_OUT
+        ) {
             return _exitExactBPTInForTokenOut(balances, userData);
-        } else if (kind == StablePoolUserData.ExitKind.EXACT_BPT_IN_FOR_TOKENS_OUT) {
+        } else if (
+            kind == StablePoolUserData.ExitKind.EXACT_BPT_IN_FOR_TOKENS_OUT
+        ) {
             return _exitExactBPTInForTokensOut(balances, userData);
-        } else if (kind == StablePoolUserData.ExitKind.BPT_IN_FOR_EXACT_TOKENS_OUT) {
-            return _exitBPTInForExactTokensOut(balances, scalingFactors, userData);
+        } else if (
+            kind == StablePoolUserData.ExitKind.BPT_IN_FOR_EXACT_TOKENS_OUT
+        ) {
+            return
+                _exitBPTInForExactTokensOut(balances, scalingFactors, userData);
         } else {
             _revert(Errors.UNHANDLED_EXIT_KIND);
         }
     }
 
-    function _exitExactBPTInForTokenOut(uint256[] memory balances, bytes memory userData)
-        private
-        view
-        whenNotPaused
-        returns (uint256, uint256[] memory)
-    {
+    function _exitExactBPTInForTokenOut(
+        uint256[] memory balances,
+        bytes memory userData
+    ) private view whenNotPaused returns (uint256, uint256[] memory) {
         // This exit function is disabled if the contract is paused.
 
-        (uint256 bptAmountIn, uint256 tokenIndex) = userData.exactBptInForTokenOut();
+        (uint256 bptAmountIn, uint256 tokenIndex) = userData
+            .exactBptInForTokenOut();
         // Note that there is no minimum amountOut parameter: this is handled by `IVault.exitPool`.
 
         _require(tokenIndex < _getTotalTokens(), Errors.OUT_OF_BOUNDS);
@@ -485,11 +526,10 @@ contract StablePool is BaseGeneralPool, BaseMinimalSwapInfoPool, IRateProvider {
         return (bptAmountIn, amountsOut);
     }
 
-    function _exitExactBPTInForTokensOut(uint256[] memory balances, bytes memory userData)
-        private
-        view
-        returns (uint256, uint256[] memory)
-    {
+    function _exitExactBPTInForTokensOut(
+        uint256[] memory balances,
+        bytes memory userData
+    ) private view returns (uint256, uint256[] memory) {
         // This exit function is the only one that is not disabled if the contract is paused: it remains unrestricted
         // in an attempt to provide users with a mechanism to retrieve their tokens in case of an emergency.
         // This particular exit function is the only one that remains available because it is the simplest one, and
@@ -513,8 +553,12 @@ contract StablePool is BaseGeneralPool, BaseMinimalSwapInfoPool, IRateProvider {
     ) private view whenNotPaused returns (uint256, uint256[] memory) {
         // This exit function is disabled if the contract is paused.
 
-        (uint256[] memory amountsOut, uint256 maxBPTAmountIn) = userData.bptInForExactTokensOut();
-        InputHelpers.ensureInputLengthMatch(amountsOut.length, _getTotalTokens());
+        (uint256[] memory amountsOut, uint256 maxBPTAmountIn) = userData
+            .bptInForExactTokensOut();
+        InputHelpers.ensureInputLengthMatch(
+            amountsOut.length,
+            _getTotalTokens()
+        );
         _upscaleArray(amountsOut, scalingFactors);
 
         (uint256 currentAmp, ) = _getAmplificationParameter();
@@ -535,7 +579,10 @@ contract StablePool is BaseGeneralPool, BaseMinimalSwapInfoPool, IRateProvider {
     /**
      * @dev Stores the last measured invariant, and the amplification parameter used to compute it.
      */
-    function _updateLastInvariant(uint256 invariant, uint256 amplificationParameter) internal {
+    function _updateLastInvariant(
+        uint256 invariant,
+        uint256 amplificationParameter
+    ) internal {
         _lastInvariant = invariant;
         _lastInvariantAmp = amplificationParameter;
     }
@@ -544,13 +591,14 @@ contract StablePool is BaseGeneralPool, BaseMinimalSwapInfoPool, IRateProvider {
      * @dev Returns the amount of protocol fees to pay, given the value of the last stored invariant and the current
      * balances.
      */
-    function _getDueProtocolFeeAmounts(uint256[] memory balances, uint256 protocolSwapFeePercentage)
-        private
-        view
-        returns (uint256[] memory)
-    {
+    function _getDueProtocolFeeAmounts(
+        uint256[] memory balances,
+        uint256 protocolSwapFeePercentage
+    ) private view returns (uint256[] memory) {
         // Initialize with zeros
-        uint256[] memory dueProtocolFeeAmounts = new uint256[](_getTotalTokens());
+        uint256[] memory dueProtocolFeeAmounts = new uint256[](
+            _getTotalTokens()
+        );
 
         // Early return if the protocol swap fee percentage is zero, saving gas.
         if (protocolSwapFeePercentage == 0) {
@@ -573,13 +621,14 @@ contract StablePool is BaseGeneralPool, BaseMinimalSwapInfoPool, IRateProvider {
         }
 
         // Set the fee amount to pay in the selected token
-        dueProtocolFeeAmounts[chosenTokenIndex] = StableMath._calcDueTokenProtocolSwapFeeAmount(
-            _lastInvariantAmp,
-            balances,
-            _lastInvariant,
-            chosenTokenIndex,
-            protocolSwapFeePercentage
-        );
+        dueProtocolFeeAmounts[chosenTokenIndex] = StableMath
+            ._calcDueTokenProtocolSwapFeeAmount(
+                _lastInvariantAmp,
+                balances,
+                _lastInvariant,
+                chosenTokenIndex,
+                protocolSwapFeePercentage
+            );
 
         return dueProtocolFeeAmounts;
     }
@@ -588,9 +637,10 @@ contract StablePool is BaseGeneralPool, BaseMinimalSwapInfoPool, IRateProvider {
      * @dev Computes and stores the value of the invariant after a join, which is required to compute due protocol fees
      * in the future.
      */
-    function _updateInvariantAfterJoin(uint256[] memory balances, uint256[] memory amountsIn)
-        private
-    {
+    function _updateInvariantAfterJoin(
+        uint256[] memory balances,
+        uint256[] memory amountsIn
+    ) private {
         _mutateAmounts(balances, amountsIn, FixedPoint.add);
 
         (uint256 currentAmp, ) = _getAmplificationParameter();
@@ -606,9 +656,10 @@ contract StablePool is BaseGeneralPool, BaseMinimalSwapInfoPool, IRateProvider {
      * @dev Computes and stores the value of the invariant after an exit, which is required to compute due protocol fees
      * in the future.
      */
-    function _updateInvariantAfterExit(uint256[] memory balances, uint256[] memory amountsOut)
-        private
-    {
+    function _updateInvariantAfterExit(
+        uint256[] memory balances,
+        uint256[] memory amountsOut
+    ) private {
         _mutateAmounts(balances, amountsOut, FixedPoint.sub);
 
         (uint256 currentAmp, ) = _getAmplificationParameter();
@@ -657,10 +708,10 @@ contract StablePool is BaseGeneralPool, BaseMinimalSwapInfoPool, IRateProvider {
      * NOTE: Internally, the amplification parameter is represented using higher precision. The values returned by
      * `getAmplificationParameter` have to be corrected to account for this when comparing to `rawEndValue`.
      */
-    function startAmplificationParameterUpdate(uint256 rawEndValue, uint256 endTime)
-        external
-        authenticate
-    {
+    function startAmplificationParameterUpdate(
+        uint256 rawEndValue,
+        uint256 endTime
+    ) external authenticate {
         _require(rawEndValue >= StableMath._MIN_AMP, Errors.MIN_AMP);
         _require(rawEndValue <= StableMath._MAX_AMP, Errors.MAX_AMP);
 
@@ -676,9 +727,18 @@ contract StablePool is BaseGeneralPool, BaseMinimalSwapInfoPool, IRateProvider {
         // We perform all multiplications first to not reduce precision, and round the division up as we want to avoid
         // large rates. Note that these are regular integer multiplications and divisions, not fixed point.
         uint256 dailyRate = endValue > currentValue
-            ? Math.divUp(Math.mul(1 days, endValue), Math.mul(currentValue, duration))
-            : Math.divUp(Math.mul(1 days, currentValue), Math.mul(endValue, duration));
-        _require(dailyRate <= _MAX_AMP_UPDATE_DAILY_RATE, Errors.AMP_RATE_TOO_HIGH);
+            ? Math.divUp(
+                Math.mul(1 days, endValue),
+                Math.mul(currentValue, duration)
+            )
+            : Math.divUp(
+                Math.mul(1 days, currentValue),
+                Math.mul(endValue, duration)
+            );
+        _require(
+            dailyRate <= _MAX_AMP_UPDATE_DAILY_RATE,
+            Errors.AMP_RATE_TOO_HIGH
+        );
 
         _setAmplificationData(currentValue, endValue, block.timestamp, endTime);
     }
@@ -693,27 +753,35 @@ contract StablePool is BaseGeneralPool, BaseMinimalSwapInfoPool, IRateProvider {
         _setAmplificationData(currentValue);
     }
 
-    function _isOwnerOnlyAction(bytes32 actionId) internal view virtual override returns (bool) {
+    function _isOwnerOnlyAction(
+        bytes32 actionId
+    ) internal view virtual override returns (bool) {
         return
-            (actionId == getActionId(StablePool.startAmplificationParameterUpdate.selector)) ||
-            (actionId == getActionId(StablePool.stopAmplificationParameterUpdate.selector)) ||
+            (actionId ==
+                getActionId(
+                    StablePool.startAmplificationParameterUpdate.selector
+                )) ||
+            (actionId ==
+                getActionId(
+                    StablePool.stopAmplificationParameterUpdate.selector
+                )) ||
             super._isOwnerOnlyAction(actionId);
     }
 
     function getAmplificationParameter()
         external
         view
-        returns (
-            uint256 value,
-            bool isUpdating,
-            uint256 precision
-        )
+        returns (uint256 value, bool isUpdating, uint256 precision)
     {
         (value, isUpdating) = _getAmplificationParameter();
         precision = StableMath._AMP_PRECISION;
     }
 
-    function _getAmplificationParameter() internal view returns (uint256 value, bool isUpdating) {
+    function _getAmplificationParameter()
+        internal
+        view
+        returns (uint256 value, bool isUpdating)
+    {
         (
             uint256 startValue,
             uint256 endValue,
@@ -753,11 +821,19 @@ contract StablePool is BaseGeneralPool, BaseMinimalSwapInfoPool, IRateProvider {
         return StableMath._MAX_STABLE_TOKENS;
     }
 
-    function _getTotalTokens() internal view virtual override returns (uint256) {
+    function _getTotalTokens()
+        internal
+        view
+        virtual
+        override
+        returns (uint256)
+    {
         return _totalTokens;
     }
 
-    function _scalingFactor(IERC20 token) internal view virtual override returns (uint256) {
+    function _scalingFactor(
+        IERC20 token
+    ) internal view virtual override returns (uint256) {
         // prettier-ignore
         if (_isToken0(token)) { return _getScalingFactor0(); }
         else if (_isToken1(token)) { return _getScalingFactor1(); }
@@ -769,7 +845,13 @@ contract StablePool is BaseGeneralPool, BaseMinimalSwapInfoPool, IRateProvider {
         }
     }
 
-    function _scalingFactors() internal view virtual override returns (uint256[] memory) {
+    function _scalingFactors()
+        internal
+        view
+        virtual
+        override
+        returns (uint256[] memory)
+    {
         uint256 totalTokens = _getTotalTokens();
         uint256[] memory scalingFactors = new uint256[](totalTokens);
 

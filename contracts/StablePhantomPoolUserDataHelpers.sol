@@ -17,27 +17,37 @@ pragma solidity ^0.7.0;
 import "./StablePhantomPool.sol";
 
 library StablePhantomPoolUserDataHelpers {
-    function joinKind(bytes memory self) internal pure returns (StablePhantomPool.JoinKindPhantom) {
+    function joinKind(
+        bytes memory self
+    ) internal pure returns (StablePhantomPool.JoinKindPhantom) {
         return abi.decode(self, (StablePhantomPool.JoinKindPhantom));
     }
 
-    function exitKind(bytes memory self) internal pure returns (StablePhantomPool.ExitKindPhantom) {
+    function exitKind(
+        bytes memory self
+    ) internal pure returns (StablePhantomPool.ExitKindPhantom) {
         return abi.decode(self, (StablePhantomPool.ExitKindPhantom));
     }
 
     // Joins
 
-    function initialAmountsIn(bytes memory self)
-        internal
-        pure
-        returns (uint256[] memory amountsIn)
-    {
-        (, amountsIn) = abi.decode(self, (StablePhantomPool.JoinKindPhantom, uint256[]));
+    function initialAmountsIn(
+        bytes memory self
+    ) internal pure returns (uint256[] memory amountsIn) {
+        (, amountsIn) = abi.decode(
+            self,
+            (StablePhantomPool.JoinKindPhantom, uint256[])
+        );
     }
 
     // Exits
 
-    function exactBptInForTokensOut(bytes memory self) internal pure returns (uint256 bptAmountIn) {
-        (, bptAmountIn) = abi.decode(self, (StablePhantomPool.ExitKindPhantom, uint256));
+    function exactBptInForTokensOut(
+        bytes memory self
+    ) internal pure returns (uint256 bptAmountIn) {
+        (, bptAmountIn) = abi.decode(
+            self,
+            (StablePhantomPool.ExitKindPhantom, uint256)
+        );
     }
 }

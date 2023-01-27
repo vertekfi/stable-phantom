@@ -55,11 +55,12 @@ library LogExpMath {
     int256 constant LN_36_LOWER_BOUND = ONE_18 - 1e17;
     int256 constant LN_36_UPPER_BOUND = ONE_18 + 1e17;
 
-    uint256 constant MILD_EXPONENT_BOUND = 2**254 / uint256(ONE_20);
+    uint256 constant MILD_EXPONENT_BOUND = 2 ** 254 / uint256(ONE_20);
 
     // 18 decimal constants
     int256 constant x0 = 128000000000000000000; // 2ˆ7
-    int256 constant a0 = 38877084059945950922200000000000000000000000000000000000; // eˆ(x0) (no decimals)
+    int256 constant a0 =
+        38877084059945950922200000000000000000000000000000000000; // eˆ(x0) (no decimals)
     int256 constant x1 = 64000000000000000000; // 2ˆ6
     int256 constant a1 = 6235149080811616882910000000; // eˆ(x1) (no decimals)
 
@@ -105,7 +106,7 @@ library LogExpMath {
         // x^y = exp(y * ln(x)).
 
         // The ln function takes a signed value, so we need to make sure x fits in the signed 256 bit range.
-        _require(x < 2**255, Errors.X_OUT_OF_BOUNDS);
+        _require(x < 2 ** 255, Errors.X_OUT_OF_BOUNDS);
         int256 x_int256 = int256(x);
 
         // We will compute y * ln(x) in a single step. Depending on the value of x, we can either use ln or ln_36. In
@@ -134,7 +135,8 @@ library LogExpMath {
 
         // Finally, we compute exp(y * ln(x)) to arrive at x^y
         _require(
-            MIN_NATURAL_EXPONENT <= logx_times_y && logx_times_y <= MAX_NATURAL_EXPONENT,
+            MIN_NATURAL_EXPONENT <= logx_times_y &&
+                logx_times_y <= MAX_NATURAL_EXPONENT,
             Errors.PRODUCT_OUT_OF_BOUNDS
         );
 
@@ -147,7 +149,10 @@ library LogExpMath {
      * Reverts if `x` is smaller than MIN_NATURAL_EXPONENT, or larger than `MAX_NATURAL_EXPONENT`.
      */
     function exp(int256 x) internal pure returns (int256) {
-        _require(x >= MIN_NATURAL_EXPONENT && x <= MAX_NATURAL_EXPONENT, Errors.INVALID_EXPONENT);
+        _require(
+            x >= MIN_NATURAL_EXPONENT && x <= MAX_NATURAL_EXPONENT,
+            Errors.INVALID_EXPONENT
+        );
 
         if (x < 0) {
             // We only handle positive exponents: e^(-x) is computed as 1 / e^x. We can safely make x positive since it

@@ -54,7 +54,10 @@ contract BalancerPoolToken is ERC20Permit {
      * This is sound as the Vault already provides authorization mechanisms when initiation token transfers, which this
      * contract inherits.
      */
-    function allowance(address owner, address spender) public view override returns (uint256) {
+    function allowance(
+        address owner,
+        address spender
+    ) public view override returns (uint256) {
         if (spender == address(getVault())) {
             return uint256(-1);
         } else {
@@ -89,7 +92,10 @@ contract BalancerPoolToken is ERC20Permit {
     /**
      * @dev Override to allow decreasing allowance by more than the current amount (setting it to zero)
      */
-    function decreaseAllowance(address spender, uint256 amount) public override returns (bool) {
+    function decreaseAllowance(
+        address spender,
+        uint256 amount
+    ) public override returns (bool) {
         uint256 currentAllowance = allowance(msg.sender, spender);
 
         if (amount >= currentAllowance) {

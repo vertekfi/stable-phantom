@@ -39,8 +39,20 @@ abstract contract BaseGeneralPool is IGeneralPool, BasePool {
 
         return
             swapRequest.kind == IVault.SwapKind.GIVEN_IN
-                ? _swapGivenIn(swapRequest, balances, indexIn, indexOut, scalingFactors)
-                : _swapGivenOut(swapRequest, balances, indexIn, indexOut, scalingFactors);
+                ? _swapGivenIn(
+                    swapRequest,
+                    balances,
+                    indexIn,
+                    indexOut,
+                    scalingFactors
+                )
+                : _swapGivenOut(
+                    swapRequest,
+                    balances,
+                    indexIn,
+                    indexOut,
+                    scalingFactors
+                );
     }
 
     function _swapGivenIn(
@@ -54,9 +66,17 @@ abstract contract BaseGeneralPool is IGeneralPool, BasePool {
         swapRequest.amount = _subtractSwapFeeAmount(swapRequest.amount);
 
         _upscaleArray(balances, scalingFactors);
-        swapRequest.amount = _upscale(swapRequest.amount, scalingFactors[indexIn]);
+        swapRequest.amount = _upscale(
+            swapRequest.amount,
+            scalingFactors[indexIn]
+        );
 
-        uint256 amountOut = _onSwapGivenIn(swapRequest, balances, indexIn, indexOut);
+        uint256 amountOut = _onSwapGivenIn(
+            swapRequest,
+            balances,
+            indexIn,
+            indexOut
+        );
 
         // amountOut tokens are exiting the Pool, so we round down.
         return _downscaleDown(amountOut, scalingFactors[indexOut]);
@@ -70,9 +90,17 @@ abstract contract BaseGeneralPool is IGeneralPool, BasePool {
         uint256[] memory scalingFactors
     ) internal returns (uint256) {
         _upscaleArray(balances, scalingFactors);
-        swapRequest.amount = _upscale(swapRequest.amount, scalingFactors[indexOut]);
+        swapRequest.amount = _upscale(
+            swapRequest.amount,
+            scalingFactors[indexOut]
+        );
 
-        uint256 amountIn = _onSwapGivenOut(swapRequest, balances, indexIn, indexOut);
+        uint256 amountIn = _onSwapGivenOut(
+            swapRequest,
+            balances,
+            indexIn,
+            indexOut
+        );
 
         // amountIn tokens are entering the Pool, so we round up.
         amountIn = _downscaleUp(amountIn, scalingFactors[indexIn]);

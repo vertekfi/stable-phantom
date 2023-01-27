@@ -27,7 +27,10 @@ abstract contract BasePoolSplitCodeFactory is BaseSplitCodeFactory {
 
     event PoolCreated(address indexed pool);
 
-    constructor(IVault vault, bytes memory creationCode) BaseSplitCodeFactory(creationCode) {
+    constructor(
+        IVault vault,
+        bytes memory creationCode
+    ) BaseSplitCodeFactory(creationCode) {
         _vault = vault;
     }
 
@@ -45,7 +48,9 @@ abstract contract BasePoolSplitCodeFactory is BaseSplitCodeFactory {
         return _isPoolFromFactory[pool];
     }
 
-    function _create(bytes memory constructorArgs) internal override returns (address) {
+    function _create(
+        bytes memory constructorArgs
+    ) internal override returns (address) {
         address pool = super._create(constructorArgs);
 
         _isPoolFromFactory[pool] = true;
