@@ -28,13 +28,11 @@ const config: HardhatUserConfig = {
     },
     goerli: {
       url: process.env.GOERLI_RPC || "",
-      accounts:
-        process.env.LOTTERY_OPERATOR_KEY !== undefined ? [process.env.LOTTERY_OPERATOR_KEY] : [],
+      accounts: process.env.DEV_KEY !== undefined ? [process.env.DEV_KEY] : [],
     },
     bsc: {
-      url: process.env.BSC_MAINNET_URL || "",
-      accounts:
-        process.env.LOTTERY_OPERATOR_KEY !== undefined ? [process.env.LOTTERY_OPERATOR_KEY] : [],
+      url: process.env.BSC_RPC || "",
+      accounts: process.env.DEV_KEY !== undefined ? [process.env.DEV_KEY] : [],
     },
   },
   etherscan: {

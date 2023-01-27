@@ -1,8 +1,10 @@
 import { ethers } from "hardhat";
 
 async function main() {
-  const vault = "0xEE1c8DbfBf958484c6a4571F5FB7b99B74A54AA7";
-  const StablePhantomPoolFactory = await ethers.getContractFactory("StablePhantomPoolFactory");
+  const vault = "0x719488F4E859953967eFE963c6Bed059BaAab60c";
+  const StablePhantomPoolFactory = await ethers.getContractFactory(
+    "StablePhantomPoolFactory"
+  );
   const factory = await StablePhantomPoolFactory.deploy(vault);
   await factory.deployed();
 
